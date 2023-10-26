@@ -1,4 +1,4 @@
-package org.gg.domain;
+package org.gg.model;
 
 public class Order {
 }

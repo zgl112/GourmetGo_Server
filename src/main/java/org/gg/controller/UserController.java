@@ -1,6 +1,8 @@
 package org.gg.controller;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.gg.model.User;
 import org.gg.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -27,36 +29,31 @@ public class UserController {
         this.userService = userService;
     }
 
-    // Get all users
-    @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        //TODO: Alex to write logic
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    // Create a new user
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        //TODO: Alex to write logic
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
     // Get a user by ID
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable String id) {
-        //TODO: Alex to write logic
-        return new ResponseEntity<>(HttpStatus.OK);
+        Optional<User> optionalUser = userService.getUserById(id);
+        return optionalUser.map(user -> new ResponseEntity<>(user, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     // Update a user by ID
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable String id, @RequestBody User user) {
-        return new ResponseEntity<>(HttpStatus.OK);
+        Optional<User> optionalUser = userService.getUserById(id);
+        return optionalUser.map(u -> new ResponseEntity<>(userService.updateUser(id, user), HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     // Delete a user by ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable String id) {
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        Optional<User> optionalUser = userService.getUserById(id);
+        if(optionalUser.isPresent()){
+            userService.removeUser(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

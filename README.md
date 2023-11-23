@@ -9,6 +9,7 @@ Welcome to the Food Delivery Service Backend! This application is built using Ja
 - [Getting Started](#getting-started)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
+- [Documentation](#documentation)
 
 ## Getting Started
 
@@ -24,5 +25,8 @@ The first step to run this project locally is to install the dependencies locate
 
 This can be done using Maven to build and install the dependencies.  
 
+## Documentation
+
+When running the application view the swagger spec from the browser here -> http://localhost:8080/swagger-ui.html
 
 Written by Chris Billing and Alexandru-Ionut Paiu

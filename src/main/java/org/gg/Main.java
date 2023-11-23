@@ -11,7 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
  * This is the primary file for the application.
  */
 @SpringBootApplication
-@EnableAutoConfiguration(exclude={MongoAutoConfiguration.class, DataSourceAutoConfiguration.class })
+@EnableAutoConfiguration(exclude={MongoAutoConfiguration.class, DataSourceAutoConfiguration.class})
 public class Main {
 
     public static void main(String[] args) {

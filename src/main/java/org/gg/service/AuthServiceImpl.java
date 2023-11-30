@@ -1,17 +1,16 @@
 package org.gg.service;
 
-//import org.gg.utils.HashUtil;
-//import org.springframework.security.core.userdetails.UserDetails;
-//import org.springframework.security.core.userdetails.UserDetailsService;
-//import org.springframework.security.core.userdetails.UsernameNotFoundException;
-//import org.springframework.stereotype.Service;
-//
+import org.gg.model.User;
+import org.gg.utils.HashUtil;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
 //@Service
-//public class AuthServiceImpl implements UserDetailsService {
+//public class AuthServiceImpl implements AuthService {
 //
-//    public String login() {
-//        //TODO:
-////        HashUtil.verifyPassword(user.getPassword, user.getSalt(), HashUtil.)
+//    public User login() {
+//        HashUtil.verifyPassword(user.getPassword, user.getSalt(), HashUtil.);
 //        return null;
 //    }
 //
@@ -19,7 +18,6 @@ package org.gg.service;
 //        return null;
 //    }
 //
-//    @Override
 //    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 //        return null;
 //    }

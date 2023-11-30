@@ -1,6 +1,5 @@
 package org.gg.service;
 
-public interface AuthService {
-    String login();
-    String register();
-}
+import org.gg.model.User;
+
+

@@ -5,14 +5,19 @@ import io.jsonwebtoken.Jwts;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Date;
 import java.util.Map;
 import org.gg.model.AuthResponse;
 import org.gg.model.User;
 
 import org.gg.service.UserService;
 import org.gg.utils.HashUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,72 +29,64 @@ public class AuthenticationController {
 
     private final UserService userService;
 
+    @Bean
+    public PasswordEncoder encoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     public AuthenticationController(UserService userService) {
         this.userService = userService;
 
     }
+    @Autowired
+    public PasswordEncoder passwordEncoder;
 
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponse> register(@RequestBody User user) throws Exception{
+        try {
+            if (userService.exists(user.getEmail())) { // Check if the account already exists
+                // Throw an exception if the account already exists
+                throw new Exception("Account already exists");
+            }
+
+            if (user.getPassword() == null) {
+                throw new Exception("Password is required");
+            }
+            user.setPassword(HashUtil.hashPassword(user.getPassword(), user.getSalt())); // Validate the password and encode it using BCryptPasswordEncoder
+            userService.addUser(user);
+            String token = generateAuthToken(user.getEmail());
+            AuthResponse authResponse = new AuthResponse(token);
+            return new ResponseEntity<>(authResponse, HttpStatus.CREATED); // Add the customer to the database and return the ResponseEntity
+        } catch (Exception e) {
+            System.out.println(user.getPassword() + "herewrwer");
+            System.out.println("here");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Handle exceptions and return appropriate HttpStatus
+
+        }
+    }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody Map<String, String> credentials) {
-        // Retrieve the email and password from the request body
+    public ResponseEntity<AuthResponse> login(@RequestBody Map<String, String> credentials)
+      throws NoSuchAlgorithmException {
         String email = credentials.get("email");
         String password = credentials.get("password");
-        // Check if the user exists in the database
-        User user = userService.getUserByEmail(email);
-        if (user == null) {
-            // Return an HTTP UNAUTHORIZED response if the user does not exist
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
+        if (userService.exists(email)) { // Check if the customer exists in the database
+            System.out.println("here");
+            User user = userService.getUserByEmail(email);
 
-        // Verify the provided password against the stored hashed password
-        try {
-            if (!HashUtil.verifyPassword(password, user.getSalt(), user.getPassword())) {
+            if (!HashUtil.verifyPassword(password, credentials.get("salt"), userService.getUserByEmail(email).getPassword())) { // Compare the provided password with the stored hashed password using BCryptPasswordEncoder
                 // Return an HTTP UNAUTHORIZED response if the login credentials are invalid
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
-        } catch (NoSuchAlgorithmException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+
+            // Generate the authorization token
+            String token = generateAuthToken(user.getEmail());
+
+            AuthResponse authResponse = new AuthResponse(token); // Create an AuthResponse object containing the token
+            return new ResponseEntity<>(authResponse, HttpStatus.OK); // Return the AuthResponse with an HTTP OK response
         }
 
-        // Generate the authorization token
-        String token = generateAuthToken(user.getEmail());
-
-        // Create an AuthResponse object containing the token
-        AuthResponse authResponse = new AuthResponse(token);
-
-        // Return the AuthResponse with an HTTP OK response
-        return new ResponseEntity<>(authResponse, HttpStatus.OK);
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user) {
-        if (userService.getUserByEmail(user.getEmail()) != null) {
-            // Return a conflict response if the user already exists
-            return new ResponseEntity<>("User with this email already exists", HttpStatus.CONFLICT);
-        }
-
-        try {
-            // Generate a new salt
-            String salt = HashUtil.generateSalt();
-
-            // Hash the user's password using the generated salt
-            String hashedPassword = HashUtil.hashPassword(user.getPassword(), salt);
-
-            // Set the hashed password and salt in the user entity
-            user.setPassword(hashedPassword);
-            user.setSalt(salt);
-
-            // Save the user to the database
-            userService.addUser(user);
-
-            // Return a success response
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        } catch (NoSuchAlgorithmException e) {
-            // Handle the exception, e.g., log it and return an internal server error response
-            return new ResponseEntity<>("Error during registration", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);// Return an HTTP UNAUTHORIZED response if the customer does not exist
     }
 
     private String generateAuthToken(String userEmail) {
@@ -115,10 +112,13 @@ public class AuthenticationController {
         claims.put("cardSecurityCode", user.getCardSecurityCode());
         claims.put("salt", user.getSalt());
 
-
+        long EXPIRATION_TIME_MS = 86400000; // 24 hours in milliseconds
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + EXPIRATION_TIME_MS);
         // Generate the token
 
         return Jwts.builder()
+          .setExpiration(expiryDate)
           .setClaims(claims)
           .compact();
     }

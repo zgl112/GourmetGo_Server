@@ -1,6 +1,9 @@
 package org.gg.model;
 
 import java.util.Collection;
+import java.util.List;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,12 +20,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements UserDetails {
+public class User implements UserDetails{
     @Id
     private String id;
     private String firstName;
     private String lastName;
     private String username;
+    @Email(message = "The email should be a valid email address")
+    @Pattern(regexp = ".+@.+\\..+", message = "Please provide a valid email address")
     private String email;
     private String password;
     private String houseNumber;

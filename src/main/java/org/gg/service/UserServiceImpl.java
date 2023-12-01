@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
     public Optional<User> getUserById(String id) {return userRepository.findById(id);}
 
     @Override
-    public User getUserByEmail(String email) { return userRepository.getUsersByEmail();}
+    public User getUserByEmail(String email) { return userRepository.getUsersByEmail(email);}
 
 
     @Override
@@ -58,5 +58,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void removeUser(String id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public boolean exists(String email) {
+        return userRepository.getUsersByEmail(email) != null;
     }
 }

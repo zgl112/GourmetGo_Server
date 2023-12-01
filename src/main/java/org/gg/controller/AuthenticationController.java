@@ -11,8 +11,10 @@ import org.gg.model.User;
 
 import org.gg.service.UserService;
 import org.gg.utils.HashUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +32,32 @@ public class AuthenticationController {
 
     }
 
+    @Autowired
+    public PasswordEncoder passwordEncoder;
+
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponse> register(@RequestBody User user) throws Exception{
+        try {
+            if (userService.exists(user.getEmail())) { // Check if the account already exists
+                // Throw an exception if the account already exists
+                throw new Exception("Account already exists");
+            }
+
+            if (user.getPassword() == null) {
+                throw new Exception("Password is required");
+            }
+            user.setPassword(HashUtil.hashPassword(user.getPassword(), user.getSalt())); // Validate the password and encode it using BCryptPasswordEncoder
+            userService.addUser(user);
+            String token = generateAuthToken(user.getEmail());
+            AuthResponse authResponse = new AuthResponse(token);
+            return new ResponseEntity<>(authResponse, HttpStatus.CREATED); // Add the customer to the database and return the ResponseEntity
+        } catch (Exception e) {
+            System.out.println(user.getPassword() + "herewrwer");
+            System.out.println("here");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Handle exceptions and return appropriate HttpStatus
+
+        }
+    }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody Map<String, String> credentials) {
@@ -61,35 +89,6 @@ public class AuthenticationController {
 
         // Return the AuthResponse with an HTTP OK response
         return new ResponseEntity<>(authResponse, HttpStatus.OK);
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user) {
-        if (userService.getUserByEmail(user.getEmail()) != null) {
-            // Return a conflict response if the user already exists
-            return new ResponseEntity<>("User with this email already exists", HttpStatus.CONFLICT);
-        }
-
-        try {
-            // Generate a new salt
-            String salt = HashUtil.generateSalt();
-
-            // Hash the user's password using the generated salt
-            String hashedPassword = HashUtil.hashPassword(user.getPassword(), salt);
-
-            // Set the hashed password and salt in the user entity
-            user.setPassword(hashedPassword);
-            user.setSalt(salt);
-
-            // Save the user to the database
-            userService.addUser(user);
-
-            // Return a success response
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        } catch (NoSuchAlgorithmException e) {
-            // Handle the exception, e.g., log it and return an internal server error response
-            return new ResponseEntity<>("Error during registration", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     private String generateAuthToken(String userEmail) {

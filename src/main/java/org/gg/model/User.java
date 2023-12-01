@@ -1,6 +1,8 @@
 package org.gg.model;
 
 import java.util.Collection;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +25,8 @@ public class User implements UserDetails {
     private String firstName;
     private String lastName;
     private String username;
+    @Email(message = "The email should be a valid email address")
+    @Pattern(regexp = ".+@.+\\..+", message = "Please provide a valid email address")
     private String email;
     private String password;
     private String houseNumber;

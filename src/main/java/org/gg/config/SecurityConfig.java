@@ -23,13 +23,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http
+          .csrf().disable()
           .authorizeRequests()
-          .antMatchers("/authentication/register", "/authentication/login").permitAll()
+          .antMatchers("/authentication/login", "/authentication/register").permitAll()
           .anyRequest().authenticated()
           .and()
-          .addFilterBefore(new JwtAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class)
-          .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+          .formLogin() // Enable form-based authentication
+          .and()
+          .httpBasic(); // Enable basic authentication
     }
 
     // Create a PasswordEncoder bean

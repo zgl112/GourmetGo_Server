@@ -1,13 +1,14 @@
 package org.gg.service;
 
+import java.util.Collection;
 import org.gg.model.User;
 import org.gg.repository.UserRepository;
 import org.gg.utils.BeanUtil;
 import org.gg.utils.HashUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
-
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
@@ -63,5 +64,45 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean exists(String email) {
         return userRepository.getUsersByEmail(email) != null;
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        return null;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getPassword() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return null;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
     }
 }

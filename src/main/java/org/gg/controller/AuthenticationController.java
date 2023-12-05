@@ -8,10 +8,10 @@ import java.time.Instant;
 import java.util.Map;
 import org.gg.model.AuthResponse;
 import org.gg.model.User;
-
 import org.gg.service.UserService;
 import org.gg.utils.HashUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
 
     private final UserService userService;
-
 
     public AuthenticationController(UserService userService) {
         this.userService = userService;
@@ -46,40 +45,41 @@ public class AuthenticationController {
             if (user.getPassword() == null) {
                 throw new Exception("Password is required");
             }
-            user.setPassword(HashUtil.hashPassword(user.getPassword(), user.getSalt())); // Validate the password and encode it using BCryptPasswordEncoder
+            user.setPassword(HashUtil.hashPassword(user.getPassword(), HashUtil.generateSalt())); // Validate the password and encode it using BCryptPasswordEncoder
             userService.addUser(user);
             String token = generateAuthToken(user.getEmail());
             AuthResponse authResponse = new AuthResponse(token);
             return new ResponseEntity<>(authResponse, HttpStatus.CREATED); // Add the customer to the database and return the ResponseEntity
         } catch (Exception e) {
-            System.out.println(user.getPassword() + "herewrwer");
-            System.out.println("here");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Handle exceptions and return appropriate HttpStatus
-
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody Map<String, String> credentials) {
+    public ResponseEntity<AuthResponse> login(@RequestBody Map<String, String> credentials)
+      throws NoSuchAlgorithmException {
         // Retrieve the email and password from the request body
         String email = credentials.get("email");
         String password = credentials.get("password");
-        // Check if the user exists in the database
         User user = userService.getUserByEmail(email);
+
+        // Check if the user exists in the database
+
+        System.out.println("|12312321");
         if (user == null) {
             // Return an HTTP UNAUTHORIZED response if the user does not exist
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         // Verify the provided password against the stored hashed password
-        try {
-            if (!HashUtil.verifyPassword(password, user.getSalt(), user.getPassword())) {
-                // Return an HTTP UNAUTHORIZED response if the login credentials are invalid
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            }
-        } catch (NoSuchAlgorithmException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        if (!HashUtil.hashPassword(password, user.getSalt()).equals(user.getPassword())) {
+
+            System.out.println("Unauthorised");
+            // Return an HTTP UNAUTHORIZED response if the login credentials are invalid
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+
+        System.out.println("here");
 
         // Generate the authorization token
         String token = generateAuthToken(user.getEmail());
@@ -98,7 +98,7 @@ public class AuthenticationController {
         Instant expirationTime = Instant.now().plus(Duration.ofHours(2));
 
         // add the claims of the token
-        Claims claims = Jwts.claims().setSubject(userEmail);
+        Claims claims = Jwts.claims();
         claims.put("exp", expirationTime.toEpochMilli());
         claims.put("id", user.getId());
         claims.put("firstName", user.getFirstName());
@@ -116,8 +116,8 @@ public class AuthenticationController {
 
 
         // Generate the token
-
         return Jwts.builder()
+          .setSubject("accessToken")
           .setClaims(claims)
           .compact();
     }

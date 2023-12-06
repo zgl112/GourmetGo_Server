@@ -19,6 +19,7 @@ public class Restaurant {
     private String name;
     private String contactInfo;
     private String address;
+    private String imageUrl;
     private String postcode;
     private double latitude;
     private double longitude;

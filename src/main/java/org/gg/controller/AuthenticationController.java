@@ -70,7 +70,6 @@ public class AuthenticationController {
 
         // Check if the user exists in the database
 
-        System.out.println("|12312321");
         if (user == null) {
             // Return an HTTP UNAUTHORIZED response if the user does not exist
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -78,16 +77,9 @@ public class AuthenticationController {
 
         // Verify the provided password against the stored hashed password
         if (!HashUtil.verifyPassword(password, user.getSalt(), user.getPassword())) {
-
-            System.out.println(password);
-            System.out.println(user.getSalt());
-            System.out.println(user.getPassword());
-            System.out.println("Unauthorised");
             // Return an HTTP UNAUTHORIZED response if the login credentials are invalid
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-
-        System.out.println("here");
 
         // Generate the authorization token
         String token = jwtProvider.generateToken(user);
@@ -98,36 +90,5 @@ public class AuthenticationController {
         // Return the AuthResponse with an HTTP OK response
         return new ResponseEntity<>(authResponse, HttpStatus.OK);
     }
-
-//    private String generateAuthToken(String userEmail) {
-//        // Generate an authorization token for the given email
-//        User user = userService.getUserByEmail(userEmail);
-//        // Set the expiration time for the token
-//        Instant expirationTime = Instant.now().plus(Duration.ofHours(2));
-//
-//        // add the claims of the token
-//        Claims claims = Jwts.claims();
-//        claims.put("exp", expirationTime.toEpochMilli());
-//        claims.put("id", user.getId());
-//        claims.put("firstName", user.getFirstName());
-//        claims.put("lastName", user.getLastName());
-//        claims.put("username", user.getUsername());
-//        claims.put("email", user.getEmail());
-//        claims.put("password", user.getPassword());
-//        claims.put("houseNumber", user.getHouseNumber());
-//        claims.put("streetName", user.getStreetName());
-//        claims.put("flatDetails", user.getFlatDetails());
-//        claims.put("postcode", user.getPostcode());
-//        claims.put("cardNumber", user.getCardNumber());
-//        claims.put("cardSecurityCode", user.getCardSecurityCode());
-//        claims.put("salt", user.getSalt());
-//
-//
-//        // Generate the token
-//        return Jwts.builder()
-//          .setSubject("accessToken")
-//          .setClaims(claims)
-//          .compact();
-//    }
 
 }

@@ -12,4 +12,6 @@ import lombok.NoArgsConstructor;
 public class FoodItem {
     private String name;
     private double price;
+    private String imageUrl;
+
 }

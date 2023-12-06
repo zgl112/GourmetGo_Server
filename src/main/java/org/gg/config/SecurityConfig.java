@@ -2,7 +2,6 @@ package org.gg.config;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.gg.security.JwtAuthenticationFilter;
 import org.gg.utils.JwtAuthFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -24,24 +23,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtAuthFilter jwtAuthenticationFilter;
 
+    private static final String[] AUTH_WHITELIST = {
+            "/v2/api-docs",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui.html",
+            "/webjars/**",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/authentication/register",
+            "/authentication/login"
+    };
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
+        http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/authentication/register", "/authentication/login", "/swagger-ui","/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html")
-                .permitAll()
-                .anyRequest()
-                .authenticated()
+                .antMatchers(AUTH_WHITELIST).permitAll()
+                .anyRequest().authenticated()
                 .and()
                 .httpBasic()
                 .and()
                 .addFilterAfter(jwtAuthenticationFilter, BasicAuthenticationFilter.class);
-
-
-
-         // Enable JwtAuthenticationFilter
+        // Enable JwtAuthenticationFilter
     }
 
     // Create a PasswordEncoder bean

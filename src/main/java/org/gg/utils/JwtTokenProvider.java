@@ -27,7 +27,7 @@ public class JwtTokenProvider {
         Claims claims = Jwts.claims().setSubject(user.getUsername());
         claims.put("email", user.getEmail());
         claims.put("sub", user.getId());
-
+        //build token based on above parameters
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)

@@ -1,5 +1,6 @@
 package org.gg.service;
 
+import java.security.spec.InvalidKeySpecException;
 import java.util.Collection;
 import org.gg.model.User;
 import org.gg.repository.UserRepository;
@@ -23,16 +24,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User addUser(User user) {
-        user.setSalt(HashUtil.generateSalt());
-        String password = user.getPassword();
-        try {
-            user.setPassword(HashUtil.hashPassword(password, user.getSalt()));
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-        return userRepository.save(user);
-    }
+    public User addUser(User user) { return userRepository.save(user);}
 
     @Override
     public Optional<User> getUserById(String id) {return userRepository.findById(id);}

@@ -45,7 +45,8 @@ public class AuthenticationController {
             if (user.getPassword() == null) {
                 throw new Exception("Password is required");
             }
-            user.setPassword(HashUtil.hashPassword(user.getPassword(), HashUtil.generateSalt())); // Validate the password and encode it using BCryptPasswordEncoder
+            user.setSalt(HashUtil.generateSalt());
+            user.setPassword(HashUtil.hashPassword(user.getPassword(), user.getSalt())); // Validate the password and encode it using BCryptPasswordEncoder
             userService.addUser(user);
             String token = generateAuthToken(user.getEmail());
             AuthResponse authResponse = new AuthResponse(token);
@@ -72,8 +73,11 @@ public class AuthenticationController {
         }
 
         // Verify the provided password against the stored hashed password
-        if (!HashUtil.hashPassword(password, user.getSalt()).equals(user.getPassword())) {
+        if (!HashUtil.verifyPassword(password, user.getSalt(), user.getPassword())) {
 
+            System.out.println(password);
+            System.out.println(user.getSalt());
+            System.out.println(user.getPassword());
             System.out.println("Unauthorised");
             // Return an HTTP UNAUTHORIZED response if the login credentials are invalid
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

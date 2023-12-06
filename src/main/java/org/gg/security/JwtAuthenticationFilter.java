@@ -38,16 +38,11 @@ import org.webjars.NotFoundException;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    @Value("${jwt.secret}")
-    private String jwtSecret;
 
     private final Base64.Decoder base64Decoder;
 
     private final ObjectMapper objectMapper;
 
-    public String getSecretKey() {
-        return jwtSecret;
-    }
     private final UserRepository userRepository;
 
     public JwtAuthenticationFilter(UserRepository userRepository) {

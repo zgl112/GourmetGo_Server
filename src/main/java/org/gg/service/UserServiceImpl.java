@@ -1,13 +1,15 @@
 package org.gg.service;
 
+import java.security.spec.InvalidKeySpecException;
+import java.util.Collection;
 import org.gg.model.User;
 import org.gg.repository.UserRepository;
 import org.gg.utils.BeanUtil;
 import org.gg.utils.HashUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
-
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
@@ -22,19 +24,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User addUser(User user) {
-        user.setSalt(HashUtil.generateSalt());
-        String password = user.getPassword();
-        try {
-            user.setPassword(HashUtil.hashPassword(password, user.getSalt()));
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-        return userRepository.save(user);
-    }
+    public User addUser(User user) { return userRepository.save(user);}
 
     @Override
     public Optional<User> getUserById(String id) {return userRepository.findById(id);}
+
+    @Override
+    public User getUserByEmail(String email) { return userRepository.getUsersByEmail(email);}
 
 
     @Override
@@ -55,5 +51,50 @@ public class UserServiceImpl implements UserService {
     @Override
     public void removeUser(String id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public boolean exists(String email) {
+        return userRepository.getUsersByEmail(email) != null;
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        return null;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getPassword() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return null;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
     }
 }

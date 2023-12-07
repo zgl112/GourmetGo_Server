@@ -1,5 +1,7 @@
 package org.gg.service;
 
+import com.google.maps.errors.ApiException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import org.gg.model.Restaurant;
@@ -18,6 +20,8 @@ public interface RestaurantService {
      */
     Optional<Restaurant> getRestaurantById(String id);
 
+    List<Restaurant> getAllByRange(String postcode, int range) throws InterruptedException, ApiException, IOException;
+
     // Delete a restaurant by its unique identifier.
     void delete(String id);
 
@@ -29,9 +33,9 @@ public interface RestaurantService {
     Optional<List<Restaurant>> getAllByType(RestaurantType type);
 
     //  Update an existing restaurant.
-    Restaurant updateRestaurant(Restaurant restaurant, String id);
+    Restaurant updateRestaurant(Restaurant restaurant, String id) throws IOException, InterruptedException, ApiException;
 
     // Create a new restaurant.
-    Restaurant createRestaurant(Restaurant restaurant);
+    Restaurant createRestaurant(Restaurant restaurant) throws IOException, InterruptedException, ApiException;
 
 }

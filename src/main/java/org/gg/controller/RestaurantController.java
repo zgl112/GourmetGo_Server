@@ -1,5 +1,7 @@
 package org.gg.controller;
 
+import com.google.maps.errors.ApiException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import org.gg.model.Restaurant;
@@ -44,8 +46,9 @@ public class RestaurantController {
     }
 
     @GetMapping("/{range}/{postcode}")
-    public ResponseEntity<List<Restaurant>> getByDistance(@PathVariable Integer range, @PathVariable String postcode) {
-        List<Restaurant> restaurants = restaurantService.getAllWithinRange(range, postcode);
+    public ResponseEntity<List<Restaurant>> getByRange(@PathVariable Integer range, @PathVariable String postcode)
+      throws IOException, InterruptedException, ApiException {
+        List<Restaurant> restaurants = restaurantService.getAllByRange(postcode, range);
         return new ResponseEntity<>(restaurants, HttpStatus.OK);
     }
 
@@ -58,13 +61,15 @@ public class RestaurantController {
     }
 
     @PostMapping
-    public ResponseEntity<Restaurant> createRestaurant(@RequestBody Restaurant restaurant) {
+    public ResponseEntity<Restaurant> createRestaurant(@RequestBody Restaurant restaurant)
+      throws IOException, InterruptedException, ApiException {
         Restaurant createdRestaurant = restaurantService.createRestaurant(restaurant);
         return new ResponseEntity<>(createdRestaurant, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Restaurant> updateRestaurant(@RequestBody Restaurant restaurant, @PathVariable String id) {
+    public ResponseEntity<Restaurant> updateRestaurant(@RequestBody Restaurant restaurant, @PathVariable String id)
+      throws IOException, InterruptedException, ApiException {
         Restaurant updatedRestaurant = restaurantService.updateRestaurant(restaurant, id);
         return new ResponseEntity<>(updatedRestaurant, HttpStatus.OK);
     }

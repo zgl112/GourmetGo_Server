@@ -3,6 +3,7 @@ package org.gg.config;
 import java.util.HashMap;
 import java.util.Map;
 import org.gg.utils.JwtAuthFilter;
+import org.gg.utils.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

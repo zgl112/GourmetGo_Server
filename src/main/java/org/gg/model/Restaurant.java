@@ -1,5 +1,6 @@
 package org.gg.model;
 
+import com.google.maps.model.LatLng;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +26,9 @@ public class Restaurant {
     private double longitude;
     private RestaurantType restaurantType;
     private List<FoodItem> menu;
+
+    public Restaurant(String s, String oldName, String oldContact, String oldAddress, String oldImage, String s1, LatLng latLng, RestaurantType restaurantType, Object o) {
+    }
 
     @Override
     public String toString() {

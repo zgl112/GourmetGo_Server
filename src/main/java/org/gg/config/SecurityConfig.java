@@ -1,7 +1,7 @@
 package org.gg.config;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
 import org.gg.utils.JwtAuthFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
@@ -37,9 +38,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/authentication/login"
     };
 
+    private static final String[] allowedOrigins = {
+            "http://localhost:3000",
+            "https://gourmetgo.vercel.app/"
+    };
+
+
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
+        corsConfiguration.setAllowedOrigins(Arrays.stream(allowedOrigins).toList());
+        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PUT",
+                "OPTIONS", "PATCH", "DELETE"));
+        corsConfiguration.setAllowCredentials(true);
+        http.cors().configurationSource(request -> corsConfiguration).and().csrf().disable()
                 .authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
                 .anyRequest().authenticated()

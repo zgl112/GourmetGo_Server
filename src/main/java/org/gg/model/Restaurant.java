@@ -26,4 +26,16 @@ public class Restaurant {
     private RestaurantType restaurantType;
     private List<FoodItem> menu;
 
+    public Restaurant(String s, String oldName, String oldContact, String oldAddress, String oldImage, String s1, LatLng latLng, RestaurantType restaurantType, Object o) {
+    }
+
+    @Override
+    public String toString() {
+        return "Location{" +
+          "id='" + id + '\'' +
+          ", postcode='" + postcode + '\'' +
+          ", latitude=" + latitude +
+          ", longitude=" + longitude +
+          '}';
+    }
 }

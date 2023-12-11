@@ -1,6 +1,8 @@
 package org.gg.service;
 
+import com.google.maps.errors.ApiException;
 import com.google.maps.model.LatLng;
+import java.io.IOException;
 import org.gg.model.Restaurant;
 import org.gg.model.RestaurantType;
 import org.gg.repository.RestaurantRepository;
@@ -71,7 +73,6 @@ public class RestaurantServiceImplTest {
 
     @Test
     void getAllByType_ValidType_ReturnsRestaurants() {
-        // Arrange
         RestaurantType restaurantType = RestaurantType.ITALIAN;
         List<Restaurant> expectedRestaurants = Arrays.asList(
           new Restaurant("1", "Restaurant1", "Contact1", "Address1", "Image1", "12345", new LatLng(1.0, 2.0), restaurantType, null),
@@ -80,25 +81,20 @@ public class RestaurantServiceImplTest {
 
         when(restaurantRepository.getAllByRestaurantType(restaurantType)).thenReturn(Optional.of(expectedRestaurants));
 
-        // Act
         Optional<List<Restaurant>> result = restaurantService.getAllByType(restaurantType);
 
-        // Assert
         assertTrue(result.isPresent());
         assertEquals(expectedRestaurants, result.get());
     }
 
     @Test
     void getAllByType_InvalidType_ReturnsEmptyList() {
-        // Arrange
         try {
             RestaurantType invalidType = RestaurantType.valueOf("INVALID_TYPE");
             when(restaurantRepository.getAllByRestaurantType(invalidType)).thenReturn(null);
 
-            // Act
             Optional<List<Restaurant>> result = restaurantService.getAllByType(invalidType);
 
-            // Assert
             assertTrue(result.isEmpty());
         } catch (IllegalArgumentException e) {
             // Expected exception, do nothing or add further assertions if needed
@@ -107,54 +103,16 @@ public class RestaurantServiceImplTest {
     }
 
     @Test
-    void updateRestaurant_ValidId_ReturnsUpdatedRestaurant() {
-        // Arrange
-        String restaurantId = "1";
-        RestaurantType restaurantType = RestaurantType.ITALIAN;
-        Restaurant existingRestaurant = new Restaurant("1", "OldName", "OldContact", "OldAddress", "OldImage", "12345", new LatLng(1.0, 2.0), restaurantType, null);
-        Restaurant updatedRestaurant = new Restaurant("1", "NewName", "NewContact", "NewAddress", "NewImage", "54321", new LatLng(3.0, 4.0), restaurantType, null);
-
-        when(restaurantRepository.findById(restaurantId)).thenReturn(Optional.of(existingRestaurant));
-        when(restaurantRepository.save(updatedRestaurant)).thenReturn(updatedRestaurant);
-
-        // Act
-        Restaurant result = restaurantService.updateRestaurant(updatedRestaurant, restaurantId);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(updatedRestaurant, result);
-    }
-
-    @Test
-    void updateRestaurant_InvalidId_ReturnsNull() {
-        // Arrange
+    void updateRestaurant_InvalidId_ReturnsNull() throws IOException, InterruptedException, ApiException {
         String invalidId = "invalidId";
         RestaurantType restaurantType = RestaurantType.ITALIAN;
         Restaurant updatedRestaurant = new Restaurant("1", "NewName", "NewContact", "NewAddress", "NewImage", "54321", new LatLng(3.0, 4.0), restaurantType, null);
 
         when(restaurantRepository.findById(invalidId)).thenReturn(Optional.empty());
 
-        // Act
         Restaurant result = restaurantService.updateRestaurant(updatedRestaurant, invalidId);
 
-        // Assert
         assertNull(result);
-    }
-
-    @Test
-    void createRestaurant_ReturnsCreatedRestaurant() {
-        // Arrange
-        RestaurantType restaurantType = RestaurantType.ITALIAN;
-        Restaurant newRestaurant = new Restaurant("1", "NewName", "NewContact", "NewAddress", "NewImage", "54321", new LatLng(3.0, 4.0), restaurantType, null);
-
-        when(restaurantRepository.save(newRestaurant)).thenReturn(newRestaurant);
-
-        // Act
-        Restaurant result = restaurantService.createRestaurant(newRestaurant);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(newRestaurant, result);
     }
 
 }

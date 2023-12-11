@@ -13,5 +13,6 @@ public class FoodItem {
     private String name;
     private double price;
     private String imageUrl;
+    private String description;
 
 }

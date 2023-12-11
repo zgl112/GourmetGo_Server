@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
-
+@CrossOrigin
 @RestController
 @RequestMapping("/orders")
 public class OrderController {
